@@ -1,7 +1,11 @@
 package com.example
 
-import akka.actor.{ActorLogging, Props, Actor}
+import akka.actor.{ReceiveTimeout, ActorLogging, Props}
 import akka.cluster.sharding.ShardRegion
+import akka.persistence.PersistentActor
+
+import scala.concurrent.duration._
+
 
 object Counter {
 
@@ -10,6 +14,10 @@ object Counter {
   case object GetState
 
   case class State(id: String, counter: Int)
+
+  case object Stop
+
+  case object CounterIncremented
 
 }
 
@@ -35,18 +43,37 @@ object CounterRegion {
 
 }
 
-class Counter extends Actor with ActorLogging {
+class Counter extends PersistentActor with ActorLogging {
   import Counter._
+  import ShardRegion.Passivate
 
   private var counter = 0
 
-  override def receive: Receive = {
+  context.setReceiveTimeout(120.seconds)
+
+  override def persistenceId: String = "counter-" + self.path.name
+
+  override def receiveRecover: Receive = {
+    case e @ CounterIncremented => updateState(e)
+  }
+
+  override def receiveCommand: Receive = {
     case Inc =>
-      counter += 1
-      log.info(s"increment ${self.path.name} $counter")
+      persist(CounterIncremented)(updateState)
+
     case GetState =>
       log.info(s"get state ${self.path.name} $counter")
       sender() ! State(self.path.name, counter)
+
+    case ReceiveTimeout =>
+      context.parent ! Passivate(stopMessage = Stop)
+
+    case Stop =>
+      context.stop(self)
   }
 
+  private def updateState(event: CounterIncremented.type) = {
+    counter += 1
+    log.info(s"increment ${self.path.name} $counter")
+  }
 }

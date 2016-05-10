@@ -92,7 +92,6 @@ object NodeConfig {
       } text "set this flag to start this system as a seed node"
       opt[String]('c', "cassandra-contact-point")
         .required() valueName "<host:port>" action { (x, c) =>
-          println(x)
           c.copy(contactPoint = x) } text "out is a required file property"
       arg[String]("<seed-node>...") unbounded () optional () action { (n, c) =>
         c.copy(seedNodes = c.seedNodes :+ n)
