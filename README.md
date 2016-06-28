@@ -33,3 +33,7 @@ sbt runNode
 * [Docker Cheat Sheet](https://github.com/wsargent/docker-cheat-sheet)
 * [Docker Env Variables](http://mike-clarke.com/2013/11/docker-links-and-runtime-env-vars/)
 * [Docker Ambassador Pattern Linking](http://docs.docker.com/articles/ambassador_pattern_linking/)
+* [Activator template for Akka & Docker](https://github.com/muuki88/activator-akka-docker)
+* [Activator template for distributed workers with Akka cluster](https://github.com/typesafehub/activator-akka-distributed-workers)
+* [Akka DDDD template using CQRS/ES with a Distributed Domain](https://github.com/boldradius/akka-dddd-template)
+* [Activator template for Akka Cluster Sharding](https://github.com/typesafehub/activator-akka-cluster-sharding-scala)
